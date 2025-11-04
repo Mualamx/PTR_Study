@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token认证测试系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Token认证测试系统</h1>
+            <p>前后端分离架构演示</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card" onclick="getCurrentTime()">
+                <div class="card-icon">⏰</div>
+                <h3>查询当前时间</h3>
+                <p>点击查看服务器当前时间</p>
+                <div id="timeResult" class="result"></div>
+            </div>
+            
+            <div class="card" onclick="getUsers()">
+                <div class="card-icon">👥</div>
+                <h3>查询用户信息</h3>
+                <p>点击查看所有用户信息（需要token）</p>
+                <div id="usersResult" class="result"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">🔑</div>
+                <h3>开发者工具</h3>
+                <p>用于测试token验证机制</p>
+                <div class="button-group">
+                    <button onclick="getToken()">获取Token</button>
+                    <button onclick="testWithToken()">使用Token测试</button>
+                    <button onclick="testWithoutToken()">无Token测试</button>
+                </div>
+                <div id="tokenResult" class="result"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚙️</div>
+                <h3>系统配置</h3>
+                <div class="config-group">
+                    <label for="backendUrl">后端API地址：</label>
+                    <input type="text" id="backendUrl" value="http://127.0.0.1:8000" placeholder="请输入后端服务器地址">
+                    <button onclick="updateBackendUrl()">更新</button>
+                </div>
+                <div class="server-status">
+                    <span id="serverStatus">检查服务器状态...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-info">
+            <h4>📚 API接口文档</h4>
+            <div class="api-list">
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <code>/api/time</code>
+                    <span class="public">公开</span>
+                    <span>获取服务器时间</span>
+                </div>
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <code>/api/token</code>
+                    <span class="public">公开</span>
+                    <span>获取一次性token</span>
+                </div>
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <code>/api/users</code>
+                    <span class="protected">受保护</span>
+                    <span>获取用户列表（需要token）</span>
+                </div>
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <code>/api/status</code>
+                    <span class="public">公开</span>
+                    <span>服务器状态检查</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
