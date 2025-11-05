@@ -10,6 +10,7 @@ body {
     color: #333;
     min-height: 100vh;
     padding: 20px;
+    line-height: 1.6;
 }
 
 .container {
@@ -26,6 +27,7 @@ header {
 header h1 {
     font-size: 2.5rem;
     margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 header p {
@@ -36,7 +38,7 @@ header p {
 .dashboard {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 20px;
+    gap: 25px;
     margin-bottom: 40px;
 }
 
@@ -48,7 +50,7 @@ header p {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
-    cursor: pointer;
+    text-align: center;
 }
 
 .card:hover {
@@ -57,182 +59,224 @@ header p {
 }
 
 .card-icon {
-    font-size: 2rem;
+    font-size: 3rem;
     margin-bottom: 15px;
 }
 
 .card h3 {
     margin-bottom: 10px;
     color: #2c3e50;
+    font-size: 1.3rem;
 }
 
 .card p {
     color: #7f8c8d;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
 }
 
-.button-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 15px;
-}
-
-button {
+.test-link {
+    display: block;
     background: #3498db;
     color: white;
-    border: none;
-    padding: 10px 20px;
+    text-decoration: none;
+    padding: 12px 20px;
     border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background: #2980b9;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-.config-group {
-    margin-bottom: 15px;
-}
-
-.config-group label {
-    display: block;
-    margin-bottom: 5px;
+    margin: 15px 0;
+    transition: all 0.3s ease;
     font-weight: 500;
 }
 
-.config-group input {
+.test-link:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.link-desc {
+    font-size: 0.85rem;
+    color: #95a5a6;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+/* 表单样式 */
+.token-form {
+    margin: 15px 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-group input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    margin-bottom: 10px;
-}
-
-.server-status {
-    padding: 10px;
-    border-radius: 5px;
-    background: #f8f9fa;
     font-size: 14px;
+    transition: border-color 0.3s ease;
 }
 
-.result {
-    background: rgba(52, 152, 219, 0.1);
-    padding: 15px;
+.form-group input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+.form-button {
+    width: 100%;
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 20px;
     border-radius: 8px;
-    margin-top: 15px;
-    border-left: 4px solid #3498db;
-    display: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.result pre {
-    background: #2c3e50;
-    color: #ecf0f1;
-    padding: 10px;
-    border-radius: 5px;
-    overflow-x: auto;
-    margin-top: 10px;
-    font-size: 12px;
+.form-button:hover {
+    background: #219a52;
+    transform: translateY(-2px);
 }
 
-.api-info {
+.auto-test-btn {
+    width: 100%;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 15px 0;
+}
+
+.auto-test-btn:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* 手动测试区域 */
+.manual-test {
     background: rgba(255, 255, 255, 0.95);
     padding: 25px;
     border-radius: 15px;
+    margin-bottom: 25px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.api-info h4 {
-    margin-bottom: 20px;
+.manual-test h3 {
+    margin-bottom: 15px;
     color: #2c3e50;
 }
 
-.api-list {
+.manual-test p {
+    margin-bottom: 15px;
+    color: #7f8c8d;
+}
+
+.url-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.api-item {
+.url-item {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px;
+    gap: 10px;
+    padding: 10px;
     background: #f8f9fa;
     border-radius: 8px;
     border-left: 4px solid #3498db;
 }
 
-.method {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 12px;
-    color: white;
+.url-item strong {
+    min-width: 100px;
+    color: #2c3e50;
 }
 
-.method.get {
-    background: #28a745;
-}
-
-.api-item code {
+.url-item code {
     background: #e9ecef;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 5px;
     font-family: 'Courier New', monospace;
-    font-size: 14px;
+    font-size: 13px;
+    flex: 1;
+    color: #e74c3c;
 }
 
-.public, .protected {
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: bold;
+/* 攻击指南 */
+.attack-guide {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #e74c3c;
 }
 
-.public {
-    background: #d4edda;
-    color: #155724;
+.attack-guide h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
 }
 
-.protected {
+.attack-guide p {
+    margin-bottom: 15px;
+    color: #7f8c8d;
+}
+
+.attack-guide strong {
+    color: #2c3e50;
+}
+
+.attack-guide code {
     background: #f8d7da;
     color: #721c24;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
 }
 
-.success {
-    border-left-color: #28a745;
-    background: rgba(40, 167, 69, 0.1);
+.attack-guide ul {
+    margin: 15px 0;
+    padding-left: 20px;
+    color: #7f8c8d;
 }
 
-.error {
-    border-left-color: #dc3545;
-    background: rgba(220, 53, 69, 0.1);
+.attack-guide li {
+    margin-bottom: 8px;
 }
 
-.loading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
+/* 响应式设计 */
 @media (max-width: 768px) {
     .dashboard {
         grid-template-columns: 1fr;
     }
     
-    .button-group {
-        flex-direction: column;
-    }
-    
-    .api-item {
+    .url-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+        gap: 5px;
+    }
+    
+    .url-item strong {
+        min-width: auto;
+    }
+    
+    header h1 {
+        font-size: 2rem;
     }
 }

@@ -30,8 +30,8 @@ cd ..
 
 echo.
 echo ✅ 系统启动完成！
-echo 📊 后端API: http://39.144.39.4:8000
-echo 🌍 前端页面: http://39.144.39.4:3000
+echo 📊 后端API: http://localhost:8000
+echo 🌍 前端页面: http://localhost:3000
 echo.
 echo 请手动关闭弹出的命令窗口来停止服务
 pause

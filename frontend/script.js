@@ -64,7 +64,7 @@ async function getCurrentTime() {
 // 获取用户信息
 async function getUsers() {
     try {
-        // 先获取token - 使用正确的路由 /getToken
+        // 先获取token
         const tokenResponse = await fetch(`${backendUrl}/getToken`);
         const tokenData = await tokenResponse.json();
         
@@ -99,7 +99,7 @@ async function getUsers() {
 // 获取Token
 async function getToken() {
     try {
-        const response = await fetch(`${backendUrl}/getToken`);  // 使用正确的路由
+        const response = await fetch(`${backendUrl}/getToken`);
         const data = await response.json();
         
         currentToken = data.newtoken;
@@ -162,3 +162,41 @@ async function testWithoutToken() {
         showResult('tokenResult', '<strong>错误：</strong> 请求失败', 'error');
     }
 }
+
+// 调试功能 - 显示请求头信息
+async function debugHeaders() {
+    try {
+        const response = await fetch(`${backendUrl}/api/debug`);
+        const data = await response.json();
+        showResult('tokenResult', 
+            `<strong>调试信息：</strong><br>
+             <pre>${JSON.stringify(data, null, 2)}</pre>`, 
+            'info'
+        );
+    } catch (error) {
+        showResult('tokenResult', '<strong>错误：</strong> 调试请求失败', 'error');
+    }
+}
+
+// 自动测试功能
+async function autoTest() {
+    try {
+        // 获取token
+        const tokenResponse = await fetch('http://10.211.55.2:8000/getToken');
+        const tokenData = await tokenResponse.json();
+        
+        if (tokenData.newtoken) {
+            // 页面跳转 - Burp可以抓到这个请求
+            window.location.href = `http://10.211.55.2:8000/api/users?token=${tokenData.newtoken}`;
+        }
+    } catch (error) {
+        alert('自动测试失败: ' + error.message);
+    }
+}
+
+// 页面加载完成后的提示
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 Token认证绕过靶场已加载');
+    console.log('📡 所有链接都会产生完整的HTTP请求，Burp可以完美抓包');
+    console.log('🔧 开始你的安全测试吧！');
+});

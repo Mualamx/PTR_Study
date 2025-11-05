@@ -3,85 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Token认证测试系统</title>
+    <title>Token认证绕过靶场 - Burp抓包版</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🚀 Token认证测试系统</h1>
-            <p>前后端分离架构演示</p>
+            <h1>🎯 Token认证绕过靶场</h1>
+            <p>传统页面跳转 | Burp完美抓包</p>
         </header>
 
         <div class="dashboard">
-            <div class="card" onclick="getCurrentTime()">
+            <!-- 时间查询 -->
+            <div class="card">
                 <div class="card-icon">⏰</div>
                 <h3>查询当前时间</h3>
-                <p>点击查看服务器当前时间</p>
-                <div id="timeResult" class="result"></div>
+                <p>直接链接，Burp可抓包</p>
+                <a href="http://10.211.55.2:8000/api/time" class="test-link" target="_blank">
+                    获取服务器时间
+                </a>
+                <p class="link-desc">点击后在新页面查看时间信息</p>
             </div>
             
-            <div class="card" onclick="getUsers()">
-                <div class="card-icon">👥</div>
-                <h3>查询用户信息</h3>
-                <p>点击查看所有用户信息（需要token）</p>
-                <div id="usersResult" class="result"></div>
-            </div>
-            
+            <!-- Token获取 -->
             <div class="card">
                 <div class="card-icon">🔑</div>
-                <h3>开发者工具</h3>
-                <p>用于测试token验证机制</p>
-                <div class="button-group">
-                    <button onclick="getToken()">获取Token</button>
-                    <button onclick="testWithToken()">使用Token测试</button>
-                    <button onclick="testWithoutToken()">无Token测试</button>
-                </div>
-                <div id="tokenResult" class="result"></div>
+                <h3>获取Token</h3>
+                <p>直接链接，Burp可抓包</p>
+                <a href="http://10.211.55.2:8000/getToken" class="test-link" target="_blank">
+                    获取一次性Token
+                </a>
+                <p class="link-desc">点击后在新页面获取Token</p>
+            </div>
+            
+            <!-- 用户查询 - 表单方式 -->
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <h3>查询用户信息</h3>
+                <p>表单提交，Burp可抓包</p>
+                
+                <form action="http://10.211.55.2:8000/api/users" method="GET" target="_blank" class="token-form">
+                    <div class="form-group">
+                        <label for="tokenInput">Token参数：</label>
+                        <input type="text" id="tokenInput" name="token" placeholder="请输入token" required>
+                    </div>
+                    <button type="submit" class="form-button">查询用户列表</button>
+                </form>
+                
+                <p class="link-desc">表单提交，Token通过URL参数传递</p>
             </div>
 
+            <!-- 自动测试 -->
             <div class="card">
-                <div class="card-icon">⚙️</div>
-                <h3>系统配置</h3>
-                <div class="config-group">
-                    <label for="backendUrl">后端API地址：</label>
-                    <input type="text" id="backendUrl" value="http://127.0.0.1:8000" placeholder="请输入后端服务器地址">
-                    <button onclick="updateBackendUrl()">更新</button>
+                <div class="card-icon">🚀</div>
+                <h3>自动测试流程</h3>
+                <p>一键完成完整测试流程</p>
+                <button onclick="autoTest()" class="auto-test-btn">自动获取Token并查询用户</button>
+                <p class="link-desc">自动获取Token并跳转到用户页面</p>
+            </div>
+
+            <!-- 服务器状态 -->
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>服务器状态</h3>
+                <p>直接链接，Burp可抓包</p>
+                <a href="http://10.211.55.2:8000/api/status" class="test-link" target="_blank">
+                    查看服务器状态
+                </a>
+                <p class="link-desc">点击查看服务器运行状态</p>
+            </div>
+
+            <!-- 调试信息 -->
+            <div class="card">
+                <div class="card-icon">🐛</div>
+                <h3>调试信息</h3>
+                <p>直接链接，Burp可抓包</p>
+                <a href="http://10.211.55.2:8000/api/debug" class="test-link" target="_blank">
+                    查看请求头信息
+                </a>
+                <p class="link-desc">点击查看完整的请求头信息</p>
+            </div>
+        </div>
+
+        <!-- 手动测试区域 -->
+        <div class="manual-test">
+            <h3>🔧 手动测试URL</h3>
+            <p>复制以下URL到浏览器地址栏测试：</p>
+            <div class="url-list">
+                <div class="url-item">
+                    <strong>获取Token：</strong>
+                    <code>http://10.211.55.2:8000/getToken</code>
                 </div>
-                <div class="server-status">
-                    <span id="serverStatus">检查服务器状态...</span>
+                <div class="url-item">
+                    <strong>获取时间：</strong>
+                    <code>http://10.211.55.2:8000/api/time</code>
+                </div>
+                <div class="url-item">
+                    <strong>查询用户：</strong>
+                    <code>http://10.211.55.2:8000/api/users?token=你的token</code>
+                </div>
+                <div class="url-item">
+                    <strong>服务器状态：</strong>
+                    <code>http://10.211.55.2:8000/api/status</code>
                 </div>
             </div>
         </div>
 
-        <div class="api-info">
-            <h4>📚 API接口文档</h4>
-            <div class="api-list">
-                <div class="api-item">
-                    <span class="method get">GET</span>
-                    <code>/api/time</code>
-                    <span class="public">公开</span>
-                    <span>获取服务器时间</span>
-                </div>
-                <div class="api-item">
-                    <span class="method get">GET</span>
-                    <code>/api/token</code>
-                    <span class="public">公开</span>
-                    <span>获取一次性token</span>
-                </div>
-                <div class="api-item">
-                    <span class="method get">GET</span>
-                    <code>/api/users</code>
-                    <span class="protected">受保护</span>
-                    <span>获取用户列表（需要token）</span>
-                </div>
-                <div class="api-item">
-                    <span class="method get">GET</span>
-                    <code>/api/status</code>
-                    <span class="public">公开</span>
-                    <span>服务器状态检查</span>
-                </div>
-            </div>
+        <!-- 攻击说明 -->
+        <div class="attack-guide">
+            <h3>🎯 攻击目标说明</h3>
+            <p><strong>目标：</strong>绕过 <code>/api/users</code> 接口的Token认证机制</p>
+            <p><strong>测试方法：</strong></p>
+            <ul>
+                <li>使用Burp Suite拦截请求</li>
+                <li>修改Token参数或Header</li>
+                <li>尝试各种绕过技术</li>
+                <li>验证是否成功获取用户数据</li>
+            </ul>
+            <p><strong>提示：</strong>所有链接都会产生完整的HTTP请求，Burp可以完美抓包分析。</p>
         </div>
     </div>
 

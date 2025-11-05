@@ -45,7 +45,7 @@ def validate_and_consume_token(token):
 def json_response(data, status=200):
     """完全自定义JSON响应，确保中文正确显示"""
     response = Response(
-        json.dumps(data, ensure_ascii=False),  # 关键：ensure_ascii=False
+        json.dumps(data, ensure_ascii=False),
         status=status,
         mimetype='application/json; charset=utf-8'
     )
@@ -53,14 +53,19 @@ def json_response(data, status=200):
     return response
 
 def token_required(f):
-    """token校验装饰器"""
+    """token校验装饰器 - 支持Header和URL参数"""
     def decorated_function(*args, **kwargs):
+        # 1. 首先检查Header中的token
         token = request.headers.get('token')
         
+        # 2. 如果没有，检查URL参数中的token
+        if not token:
+            token = request.args.get('token')
+            
         if not token:
             return json_response({
                 "error": "Token缺失",
-                "message": "请在请求头中添加token"
+                "message": "请在请求头或URL参数中添加token"
             }, 401)
         
         if not validate_and_consume_token(token):
@@ -116,14 +121,14 @@ def get_status():
         "message": "服务器运行正常"
     })
 
-# 测试接口 - 直接返回中文
-@app.route('/api/test-chinese', methods=['GET'])
-def test_chinese():
-    """测试中文显示"""
+@app.route('/api/debug', methods=['GET'])
+def debug_headers():
+    """调试接口 - 显示所有请求头"""
     return json_response({
-        "chinese_test": "这是一段中文测试",
-        "users": users,
-        "message": "中文显示测试成功"
+        "headers": dict(request.headers),
+        "method": request.method,
+        "client_ip": request.remote_addr,
+        "message": "调试信息"
     })
 
 if __name__ == '__main__':
