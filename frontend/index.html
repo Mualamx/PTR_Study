@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Token认证绕过靶场 - Burp抓包版</title>
     <link rel="stylesheet" href="style.css">
+    <!-- 引入配置文件 -->
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎯 Token认证绕过靶场</h1>
-            <p>传统页面跳转 | Burp完美抓包</p>
+            <p>传统页面跳转 | Burp完美抓包 | 配置: <span id="currentConfig"></span></p>
         </header>
 
         <div class="dashboard">
@@ -19,7 +21,7 @@
                 <div class="card-icon">⏰</div>
                 <h3>查询当前时间</h3>
                 <p>直接链接，Burp可抓包</p>
-                <a href="http://10.211.55.2:8000/api/time" class="test-link" target="_blank">
+                <a href="#" id="timeLink" class="test-link" target="_blank">
                     获取服务器时间
                 </a>
                 <p class="link-desc">点击后在新页面查看时间信息</p>
@@ -30,7 +32,7 @@
                 <div class="card-icon">🔑</div>
                 <h3>获取Token</h3>
                 <p>直接链接，Burp可抓包</p>
-                <a href="http://10.211.55.2:8000/getToken" class="test-link" target="_blank">
+                <a href="#" id="tokenLink" class="test-link" target="_blank">
                     获取一次性Token
                 </a>
                 <p class="link-desc">点击后在新页面获取Token</p>
@@ -42,7 +44,7 @@
                 <h3>查询用户信息</h3>
                 <p>表单提交，Burp可抓包</p>
                 
-                <form action="http://10.211.55.2:8000/api/users" method="GET" target="_blank" class="token-form">
+                <form id="userForm" method="GET" target="_blank" class="token-form">
                     <div class="form-group">
                         <label for="tokenInput">Token参数：</label>
                         <input type="text" id="tokenInput" name="token" placeholder="请输入token" required>
@@ -67,7 +69,7 @@
                 <div class="card-icon">📊</div>
                 <h3>服务器状态</h3>
                 <p>直接链接，Burp可抓包</p>
-                <a href="http://10.211.55.2:8000/api/status" class="test-link" target="_blank">
+                <a href="#" id="statusLink" class="test-link" target="_blank">
                     查看服务器状态
                 </a>
                 <p class="link-desc">点击查看服务器运行状态</p>
@@ -78,10 +80,24 @@
                 <div class="card-icon">🐛</div>
                 <h3>调试信息</h3>
                 <p>直接链接，Burp可抓包</p>
-                <a href="http://10.211.55.2:8000/api/debug" class="test-link" target="_blank">
+                <a href="#" id="debugLink" class="test-link" target="_blank">
                     查看请求头信息
                 </a>
                 <p class="link-desc">点击查看完整的请求头信息</p>
+            </div>
+        </div>
+
+        <!-- 配置管理 -->
+        <div class="config-card">
+            <h3>⚙️ 系统配置</h3>
+            <div class="config-group">
+                <label for="backendUrlInput">后端API地址：</label>
+                <input type="text" id="backendUrlInput" placeholder="请输入后端服务器地址">
+                <button onclick="updateConfig()">更新配置</button>
+            </div>
+            <div class="current-config">
+                <strong>当前配置：</strong>
+                <span id="configDisplay"></span>
             </div>
         </div>
 
@@ -92,19 +108,19 @@
             <div class="url-list">
                 <div class="url-item">
                     <strong>获取Token：</strong>
-                    <code>http://10.211.55.2:8000/getToken</code>
+                    <code id="manualTokenUrl">http://10.211.55.2:8000/getToken</code>
                 </div>
                 <div class="url-item">
                     <strong>获取时间：</strong>
-                    <code>http://10.211.55.2:8000/api/time</code>
+                    <code id="manualTimeUrl">http://10.211.55.2:8000/api/time</code>
                 </div>
                 <div class="url-item">
                     <strong>查询用户：</strong>
-                    <code>http://10.211.55.2:8000/api/users?token=你的token</code>
+                    <code id="manualUserUrl">http://10.211.55.2:8000/api/users?token=你的token</code>
                 </div>
                 <div class="url-item">
                     <strong>服务器状态：</strong>
-                    <code>http://10.211.55.2:8000/api/status</code>
+                    <code id="manualStatusUrl">http://10.211.55.2:8000/api/status</code>
                 </div>
             </div>
         </div>

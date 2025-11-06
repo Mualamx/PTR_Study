@@ -280,3 +280,64 @@ header p {
         font-size: 2rem;
     }
 }
+
+/* 配置卡片样式 */
+.config-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #3498db;
+}
+
+.config-card h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.config-group {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 15px;
+}
+
+.config-group label {
+    font-weight: 500;
+    color: #2c3e50;
+    min-width: 120px;
+}
+
+.config-group input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.config-group button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.config-group button:hover {
+    background: #2980b9;
+}
+
+.current-config {
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.current-config strong {
+    color: #2c3e50;
+}
