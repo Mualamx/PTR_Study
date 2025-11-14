@@ -1,262 +1,162 @@
-# 🔐 Token认证绕过靶场
+# Token认证绕过靶场
 
-> 一个专为Web安全学习设计的Token认证绕过实战环境
+## 🎯 项目简介
 
-![GitHub](https://img.shields.io/badge/Version-1.0-blue)
-![GitHub](https://img.shields.io/badge/Language-Python%20%7C%20JavaScript-green)
-![GitHub](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
-![GitHub](https://img.shields.io/badge/License-MIT-yellow)
+这是一个专门为Web安全学习设计的Token认证绕过靶场环境，旨在帮助安全研究人员和开发者理解Token认证机制的原理、常见漏洞及绕过技术。
 
-## 🎯 靶场简介
+## 🚀 环境要求
 
-这是一个模拟真实Token认证机制的安全学习环境，专门用于研究和练习API认证绕过技术。靶场采用前后端分离架构，实现了严格的单次Token验证机制。
-
-## 🚨 攻击目标
-
-**核心挑战：绕过 `/api/users` 接口的Token认证**
-
-- 🎯 目标：无需获取有效Token即可访问受保护的用户数据
-- ⚡ 难度：中等（模拟真实世界认证机制）
-- 🛡️ 防御：单次Token消费 + 时间过期 + Header验证
-
-## 🏗️ 系统架构
-
-```
-token-auth-system/
-├── 🐍 backend/                 # Flask后端API服务
-│   ├── app.py                 # 核心认证逻辑
-│   └── requirements.txt       # Python依赖
-├── 🌐 frontend/               # 前端用户界面
-│   ├── index.html            # 主界面
-│   ├── style.css             # 样式文件
-│   └── script.js             # 前端逻辑
-├── 🚀 start.sh               # Linux/macOS启动脚本
-├── ⚙️ start.bat              # Windows启动脚本
-└── 📚 README.md              # 项目文档
-```
-
-## ⚡ 快速开始
-
-### 环境要求
 - Python 3.7+
-- 现代浏览器
-- 网络连接（用于前端访问后端API）
+- 现代浏览器（Chrome/Firefox/Edge）
+- 网络抓包工具（Burp Suite/OWASP ZAP 可选）
 
-### 一键启动
-**Linux/macOS:**
-```bash
-chmod +x start.sh
-./start.sh
-```
+## 📥 安装与启动
 
-**Windows:**
-```bash
-双击 start.bat
-```
+### 后端服务（Flask）
 
-### 手动启动
 ```bash
-# 启动后端服务 (端口 8000)
-cd backend
-pip install -r requirements.txt
+# 进入项目目录
+cd token-bypass-range
+
+# 安装依赖
+pip install flask flask-cors
+
+# 启动后端服务
 python app.py
-
-# 启动前端服务 (端口 3000) - 新终端
-cd frontend
-python -m http.server 3000
 ```
 
-## 🌐 访问地址
+后端服务将在 `http://0.0.0.0:8000` 启动
 
-- **前端界面**: http://localhost:3000
-- **后端API**: http://localhost:8000
+### 前端页面
 
-## 🔌 API接口文档
-
-### 📍 公开接口（无需认证）
-| 方法 | 端点 | 描述 | 示例 |
-|------|------|------|------|
-| `GET` | `/api/time` | 获取服务器时间 | `curl http://localhost:8000/api/time` |
-| `GET` | `/getToken` | 获取一次性Token | `curl http://localhost:8000/getToken` |
-| `GET` | `/api/status` | 服务器状态检查 | `curl http://localhost:8000/api/status` |
-
-### 🛡️ 受保护接口（需要Token认证）
-| 方法 | 端点 | 认证 | 描述 |
-|------|------|------|------|
-| `GET` | `/api/users` | `Header: token` | 获取用户列表 |
-
-**认证示例：**
 ```bash
-# 1. 获取Token
-curl http://localhost:8000/getToken
-
-# 2. 使用Token访问受保护接口
-curl -H "token: YOUR_TOKEN_HERE" http://localhost:8000/api/users
+# 前端为纯HTML页面，无需额外服务
+# 直接用浏览器打开 index.html 即可
 ```
 
-## 🔍 认证机制详解
+## ⚙️ 重要配置
 
-### 🎫 Token特性
-- **单次有效性**: 每个Token只能使用一次，验证后立即失效
-- **时间限制**: Token有效期为1小时
-- **Header传输**: 必须通过HTTP Header的`token`字段传递
-- **服务端状态**: 内存中维护有效Token列表
+**使用前必须配置**：进入前端文件夹，编辑 `config.js` 文件：
 
-### 🔒 防御机制
-```python
-# 核心验证逻辑
-def validate_and_consume_token(token):
-    if token not in valid_tokens: return False
-    if time.time() - valid_tokens[token] > 3600: return False
-    del valid_tokens[token]  # 单次消费
-    return True
+```javascript
+const CONFIG = {
+    // 后端API基础URL - 修改这里为你的服务器IP
+    BACKEND_URL: 'http://你的服务器IP:8000',
+    // ... 其他配置
+};
 ```
 
-## 🧪 测试指南
+**将 `你的服务器IP` 替换为实际的后端服务器IP地址**
 
-### 🔬 基础测试流程
-1. **正常流程测试**
-   ```bash
-   # 获取Token
-   curl http://localhost:8000/getToken
-   
-   # 使用Token访问
-   curl -H "token: xxx" http://localhost:8000/api/users
-   
-   # 验证Token失效
-   curl -H "token: xxx" http://localhost:8000/api/users
-   ```
+## 🎯 靶场功能
 
-2. **认证绕过尝试**
-   ```bash
-   # 直接访问（应该返回401）
-   curl http://localhost:8000/api/users
-   
-   # 空Token测试
-   curl -H "token: " http://localhost:8000/api/users
-   
-   # 特殊值测试
-   curl -H "token: null" http://localhost:8000/api/users
-   curl -H "token: undefined" http://localhost:8000/api/users
-   curl -H "token: 0" http://localhost:8000/api/users
-   ```
+### 1. 公开接口（无需Token）
+- ✅ 获取服务器时间
+- ✅ 获取Token
+- ✅ 服务器状态检查
+- ✅ 调试信息查看
 
-### 🛠️ 高级测试技术
+### 2. 受保护接口（需要Token）
+- 🔒 查询用户信息（需要有效Token）
 
-#### 1. Header Manipulation
-```bash
-# Header名称变体
-curl -H "Token: xxx" http://localhost:8000/api/users
-curl -H "TOKEN: xxx" http://localhost:8000/api/users
-curl -H "X-Token: xxx" http://localhost:8000/api/users
-curl -H "Authorization: Bearer xxx" http://localhost:8000/api/users
+### 3. Token机制特性
+- ⏰ Token有效期：1小时
+- 🔄 Token单次使用：验证后立即失效
+- 📍 Token传递方式：支持多种方式
 
-# 多个Header
-curl -H "token: xxx" -H "token: yyy" http://localhost:8000/api/users
-```
+## 🔍 测试场景
 
-#### 2. 请求方法测试
-```bash
-# HTTP方法覆盖
-curl -X POST http://localhost:8000/api/users
-curl -X PUT http://localhost:8000/api/users
-curl -X OPTIONS http://localhost:8000/api/users
-```
+### 支持的Token传递方式：
 
-#### 3. 路径遍历
-```bash
-# URL变体
-curl http://localhost:8000/api/users/
-curl http://localhost:8000/api/users/.
-curl http://localhost:8000/api/users?token=xxx
-```
+1. **GET参数**：`/api/users?token=xxx`
+2. **POST Header**：在请求头中添加 `token: xxx`
+3. **POST Body (JSON)**：`{"token": "xxx"}`
+4. **POST Body (Form)**：`token=xxx`
+5. **POST Body (Multipart)**: FormData格式
 
-### 🔧 工具集成
+### 自动测试功能
+前端提供一键测试按钮，支持所有传参方式的自动化测试。
 
-#### Burp Suite测试
-1. 配置代理到Burp
-2. 拦截前端请求
-3. 修改Token相关Header
-4. 重放请求测试
+## 🛠️ 技术架构
 
-#### Postman测试
-```json
-{
-  "method": "GET",
-  "url": "http://localhost:8000/api/users",
-  "headers": {
-    "token": "YOUR_TOKEN"
-  }
-}
-```
+### 后端技术栈
+- **框架**: Flask + Flask-CORS
+- **认证**: 自定义Token认证中间件
+- **特性**: 支持CORS、多种数据格式解析
 
-## 🎯 学习目标
+### 前端技术栈
+- **技术**: 纯HTML + CSS + JavaScript
+- **特性**: 响应式设计、实时配置更新
 
-通过本靶场，您将掌握：
+## 🔐 安全测试要点
 
-### 🧠 知识要点
-- ✅ Token认证的工作原理
-- ✅ 单次消费机制的安全意义
-- ✅ HTTP Header的安全影响
-- ✅ API安全测试方法论
+### 常见绕过技术练习：
+1. **Token重放攻击**
+2. **Token预测/爆破**
+3. **认证逻辑绕过**
+4. **参数污染攻击**
+5. **HTTP方法混淆**
 
-### 🔧 技能提升
-- ✅ 认证绕过技术实践
-- ✅ 安全工具的使用技巧
-- ✅ 漏洞挖掘的思维模式
-- ✅ 防御机制的评估能力
+### 观察点：
+- Token生成规律
+- 认证校验逻辑
+- 错误信息泄露
+- 接口响应差异
 
-## 🛡️ 防御建议
+## 📝 使用流程
 
-### 已实现的防御措施
-- 🔒 单次Token消费机制
-- ⏰ Token时间过期
-- 📍 严格的Header验证
-- 💾 服务端状态管理
+1. **环境配置**
+   - 修改 `config.js` 中的IP地址
+   - 启动后端服务
+   - 打开前端页面
 
-### 推荐的增强措施
-- 🔑 Token签名验证（JWT）
-- 🌐 CSRF保护
-- 📊 请求频率限制
-- 🔍 安全日志审计
-- 🚫 IP黑白名单
+2. **基础测试**
+   - 获取Token
+   - 使用Token访问受保护接口
+   - 观察正常流程
 
-## ❓ 常见问题
+3. **安全测试**
+   - 使用Burp Suite拦截请求
+   - 修改Token参数尝试绕过
+   - 测试各种传参方式
+   - 分析认证逻辑漏洞
 
-**Q: 为什么Token只能用一次？**  
-A: 这是模拟银行交易等高安全场景的单次认证机制。
+## 🐛 故障排除
 
-**Q: 前端如何无感使用Token？**  
-A: 前端在需要访问受保护接口时自动获取并使用Token，用户无感知。
+### 常见问题：
 
-**Q: 如何验证绕过是否成功？**  
-A: 成功访问 `/api/users` 接口并返回用户数据，且无需先获取Token。
+1. **跨域错误**
+   - 检查后端CORS配置
+   - 确认IP地址配置正确
 
-## 📄 许可证
+2. **Token验证失败**
+   - 确认Token未过期
+   - 检查Token传递方式
+   - 验证Token格式正确
 
-本项目基于 MIT 许可证开源 - 查看 [LICENSE](LICENSE) 文件了解详情。
+3. **连接失败**
+   - 检查防火墙设置
+   - 确认端口未被占用
+   - 验证IP地址可达性
+
+## 📚 学习资源
+
+- OWASP Authentication Cheat Sheet
+- Web Security Academy (PortSwigger)
+- Token-Based Authentication Best Practices
 
 ## ⚠️ 免责声明
 
-本靶场仅用于**教育学习**和**授权测试**目的。请遵守以下原则：
+本靶场仅用于教育学习和授权安全测试目的。严禁用于非法攻击或未授权的渗透测试。使用者需遵守相关法律法规，对使用本工具造成的任何后果自行承担全部责任。
 
-- 🚫 禁止用于非法渗透测试
-- 🚫 禁止攻击未授权系统  
-- 🚫 禁止用于恶意目的
-- ✅ 仅在学习环境中使用
-- ✅ 遵守当地法律法规
+## 🆘 获取帮助
+
+如遇到问题，请检查：
+1. 配置文件中的IP地址是否正确
+2. 后端服务是否正常启动
+3. 浏览器控制台错误信息
+4. 网络连接是否正常
 
 ---
 
-**Happy Hacking! 🎉 祝您学习愉快！**
-
-> 记住：真正的安全专家不仅是优秀的攻击者，更是出色的防御者。
-```
-
-这个重构的README具有：
-
-🎯 **专业美观** - 使用emoji和徽章，层次清晰
-🔧 **实用性强** - 详细的测试指南和代码示例  
-🎯 **目标明确** - 突出认证绕过的核心挑战
-📚 **教育价值** - 包含完整的学习路径和知识点
-🛡️ **安全合规** - 强调合法使用和免责声明
+**Happy Hacking! 🎯**
