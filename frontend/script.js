@@ -26,14 +26,21 @@ function updateManualUrls() {
     document.getElementById('manualUserUrl').textContent = CONFIG.getApiUrl(CONFIG.API_ENDPOINTS.USERS) + '?token=你的token';
 }
 
-// 自动测试功能
-async function autoTest() {
+// 自动测试功能 - 支持多种传参方式
+async function autoTest(method = 'get') {
     try {
         // 显示加载状态
-        const button = document.querySelector('.auto-test-btn');
-        const originalText = button.textContent;
-        button.textContent = '获取Token中...';
-        button.disabled = true;
+        const buttons = document.querySelectorAll('.test-btn');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent.includes('获取Token中')) {
+                btn.textContent = btn.textContent.replace('获取Token中...', getButtonOriginalText(btn));
+            }
+        });
+
+        const currentButton = document.querySelector(`.${method}-btn`);
+        const originalText = currentButton.textContent;
+        currentButton.textContent = '获取Token中...';
 
         // 使用配置的URL获取token
         const tokenResponse = await fetch(CONFIG.getApiUrl(CONFIG.API_ENDPOINTS.TOKEN));
@@ -45,13 +52,45 @@ async function autoTest() {
         const tokenData = await tokenResponse.json();
         
         if (tokenData.newtoken) {
-            // 显示成功信息
-            button.textContent = '跳转中...';
+            currentButton.textContent = '测试中...';
             
-            // 页面跳转 - Burp可以抓到这个请求
-            setTimeout(() => {
-                window.location.href = CONFIG.getUserUrlWithToken(tokenData.newtoken);
-            }, 500);
+            // 根据不同的传参方式进行处理
+            switch(method) {
+                case 'get':
+                    // GET传参 - 页面跳转
+                    setTimeout(() => {
+                        window.location.href = CONFIG.getUserUrlWithToken(tokenData.newtoken);
+                    }, 500);
+                    break;
+                    
+                case 'header':
+                    // Header传参 - 使用text/plain避免预检
+                    await testWithHeader(tokenData.newtoken);
+                    currentButton.textContent = originalText;
+                    buttons.forEach(btn => btn.disabled = false);
+                    break;
+                    
+                case 'json':
+                    // JSON Body传参
+                    await testWithJsonBody(tokenData.newtoken);
+                    currentButton.textContent = originalText;
+                    buttons.forEach(btn => btn.disabled = false);
+                    break;
+                    
+                case 'form':
+                    // Form Body传参 - 使用application/x-www-form-urlencoded
+                    await testWithFormBody(tokenData.newtoken);
+                    currentButton.textContent = originalText;
+                    buttons.forEach(btn => btn.disabled = false);
+                    break;
+                    
+                case 'multipart':
+                    // Multipart Form传参
+                    await testWithMultipartForm(tokenData.newtoken);
+                    currentButton.textContent = originalText;
+                    buttons.forEach(btn => btn.disabled = false);
+                    break;
+            }
         } else {
             throw new Error('Token获取响应格式错误');
         }
@@ -60,10 +99,171 @@ async function autoTest() {
         alert('自动测试失败: ' + error.message);
         
         // 恢复按钮状态
-        const button = document.querySelector('.auto-test-btn');
-        button.textContent = '自动获取Token并查询用户';
-        button.disabled = false;
+        const buttons = document.querySelectorAll('.test-btn');
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.textContent = getButtonOriginalText(btn);
+        });
     }
+}
+
+// 更新按钮文本获取函数
+function getButtonOriginalText(button) {
+    const text = button.textContent;
+    if (text.includes('通过GET传参')) return '通过GET传参';
+    if (text.includes('通过POST Header传参')) return '通过POST Header传参';
+    if (text.includes('通过POST Body(JSON)传参')) return '通过POST Body(JSON)传参';
+    if (text.includes('通过POST Body(Form)传参')) return '通过POST Body(Form)传参';
+    if (text.includes('通过POST Body(Multipart)传参')) return '通过POST Body(Multipart)传参';
+    return text;
+}
+
+// 通过Header传参测试 - 避免预检请求
+async function testWithHeader(token) {
+    try {
+        // 使用text/plain Content-Type避免预检请求
+        const response = await fetch(CONFIG.getApiUrl(CONFIG.API_ENDPOINTS.USERS), {
+            method: 'POST',
+            headers: {
+                'token': token,
+                'Content-Type': 'text/plain'  // 使用text/plain避免预检
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        showTestResult('Header传参测试', true, data);
+        
+    } catch (error) {
+        showTestResult('Header传参测试', false, {error: error.message});
+    }
+}
+
+// 通过JSON Body传参测试
+async function testWithJsonBody(token) {
+    try {
+        const response = await fetch(CONFIG.getApiUrl(CONFIG.API_ENDPOINTS.USERS), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: token
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        showTestResult('JSON Body传参测试', true, data);
+        
+    } catch (error) {
+        showTestResult('JSON Body传参测试', false, {error: error.message});
+    }
+}
+
+// 通过Form Body传参测试 - 使用URLSearchParams避免预检
+async function testWithFormBody(token) {
+    try {
+        const formData = new URLSearchParams();
+        formData.append('token', token);
+        
+        const response = await fetch(CONFIG.getApiUrl(CONFIG.API_ENDPOINTS.USERS), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'  // 这种Content-Type不会触发预检
+            },
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        showTestResult('Form Body传参测试', true, data);
+        
+    } catch (error) {
+        showTestResult('Form Body传参测试', false, {error: error.message});
+    }
+}
+
+// 新增：通过multipart/form-data传参测试
+async function testWithMultipartForm(token) {
+    try {
+        const formData = new FormData();
+        formData.append('token', token);
+        
+        const response = await fetch(CONFIG.getApiUrl(CONFIG.API_ENDPOINTS.USERS), {
+            method: 'POST',
+            body: formData  // 不设置Content-Type，浏览器会自动设置multipart/form-data
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        showTestResult('Multipart Form传参测试', true, data);
+        
+    } catch (error) {
+        showTestResult('Multipart Form传参测试', false, {error: error.message});
+    }
+}
+
+// 显示测试结果
+function showTestResult(testName, success, data) {
+    const resultDiv = document.createElement('div');
+    resultDiv.className = `test-result ${success ? 'success' : 'error'}`;
+    resultDiv.innerHTML = `
+        <h4>${testName} - ${success ? '✅ 成功' : '❌ 失败'}</h4>
+        <pre>${JSON.stringify(data, null, 2)}</pre>
+    `;
+    
+    resultDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        z-index: 1000;
+        max-width: 80%;
+        max-height: 80%;
+        overflow: auto;
+        border: 3px solid ${success ? '#28a745' : '#dc3545'};
+    `;
+    
+    // 添加关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '关闭';
+    closeBtn.style.cssText = `
+        margin-top: 10px;
+        padding: 5px 15px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    `;
+    closeBtn.onclick = () => resultDiv.remove();
+    
+    resultDiv.appendChild(closeBtn);
+    document.body.appendChild(resultDiv);
+    
+    // 点击背景关闭
+    resultDiv.addEventListener('click', (e) => {
+        if (e.target === resultDiv) {
+            resultDiv.remove();
+        }
+    });
 }
 
 // 更新配置

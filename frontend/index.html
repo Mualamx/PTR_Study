@@ -60,8 +60,16 @@
                 <div class="card-icon">🚀</div>
                 <h3>自动测试流程</h3>
                 <p>一键完成完整测试流程</p>
-                <button onclick="autoTest()" class="auto-test-btn">自动获取Token并查询用户</button>
-                <p class="link-desc">自动获取Token并跳转到用户页面</p>
+                
+                <div class="test-buttons">
+                    <button onclick="autoTest('get')" class="test-btn get-btn">通过GET传参</button>
+                    <button onclick="autoTest('header')" class="test-btn header-btn">通过POST Header传参</button>
+                    <button onclick="autoTest('json')" class="test-btn json-btn">通过POST Body(JSON)传参</button>
+                    <button onclick="autoTest('form')" class="test-btn form-btn">通过POST Body(Form)传参</button>
+                    <button onclick="autoTest('multipart')" class="test-btn multipart-btn">通过POST Body(Multipart)传参</button>
+                </div>
+                
+                <p class="link-desc">选择不同的传参方式测试Token认证</p>
             </div>
 
             <!-- 服务器状态 -->

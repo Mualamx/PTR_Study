@@ -2,8 +2,8 @@ from getToken import http_get, split_token
 
 class config:
     def __init__(self):
-        self.userUrl = "http://127.0.0.1:8000/api/users"
-        self.tokenUrl = "http://127.0.0.1:8000/getToken"
+        self.userUrl = "http://10.211.55.2:8000/api/users"
+        self.tokenUrl = "http://10.211.55.2:8000/getToken"
         self.userHeaders = {"token": "jEbu5SJWtDxFdtwx7ZDK-1762308508","Content-Type": "application/json"}
 
     def setToken(self, token : str = ""):

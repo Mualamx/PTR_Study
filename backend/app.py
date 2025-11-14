@@ -22,8 +22,7 @@ valid_tokens = {}
 def generate_token():
     """生成随机token"""
     random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
-    timestamp = str(int(time.time()))
-    return f"{random_str}-{timestamp}"
+    return f"{random_str}"
 
 def validate_and_consume_token(token):
     """验证token并使其失效（单次使用）"""
@@ -53,19 +52,56 @@ def json_response(data, status=200):
     return response
 
 def token_required(f):
-    """token校验装饰器 - 支持Header和URL参数"""
+    """token校验装饰器 - 支持Header、URL参数和POST body"""
     def decorated_function(*args, **kwargs):
+        # 允许OPTIONS预检请求通过
+        if request.method == 'OPTIONS':
+            return f(*args, **kwargs)
+            
+        token = None
+        
         # 1. 首先检查Header中的token
         token = request.headers.get('token')
         
-        # 2. 如果没有，检查URL参数中的token
+        # 2. 如果没有，检查GET URL参数中的token
         if not token:
             token = request.args.get('token')
             
+        # 3. 如果没有，检查POST body中的token
+        if not token and request.method == 'POST':
+            # 方法1: 检查表单数据
+            token = request.form.get('token')
+            
+            # 方法2: 检查JSON数据
+            if not token:
+                try:
+                    if request.is_json:
+                        token = request.json.get('token')
+                    else:
+                        # 尝试强制解析为JSON
+                        json_data = request.get_json(force=True, silent=True)
+                        if json_data and 'token' in json_data:
+                            token = json_data['token']
+                except:
+                    pass
+            
+            # 方法3: 检查原始数据
+            if not token and request.data:
+                raw_data = request.get_data(as_text=True)
+                # 解析 application/x-www-form-urlencoded 格式
+                if 'token=' in raw_data:
+                    import urllib.parse
+                    parsed_data = urllib.parse.parse_qs(raw_data)
+                    if 'token' in parsed_data:
+                        token = parsed_data['token'][0]
+                # 如果数据看起来像纯token，直接使用
+                elif raw_data and len(raw_data.strip()) < 50 and '=' not in raw_data:
+                    token = raw_data.strip()
+        
         if not token:
             return json_response({
                 "error": "Token缺失",
-                "message": "请在请求头或URL参数中添加token"
+                "message": "请在请求头、URL参数或POST body中添加token"
             }, 401)
         
         if not validate_and_consume_token(token):
@@ -89,14 +125,24 @@ def get_current_time():
         "message": "时间获取成功"
     })
 
-@app.route('/api/users', methods=['GET'])
+@app.route('/api/users', methods=['GET', 'POST', 'OPTIONS'])  # 添加OPTIONS方法
 @token_required
 def get_users():
-    """获取用户列表 - 需要token"""
+    """获取用户列表 - 需要token，支持GET和POST"""
+    # 如果是OPTIONS请求，返回CORS头
+    if request.method == 'OPTIONS':
+        response = json_response({})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'token, Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        return response
+    
     return json_response({
         "users": users,
         "count": len(users),
-        "message": "用户数据获取成功"
+        "message": "用户数据获取成功",
+        "method_used": request.method,
+        "content_type": request.content_type if request.method == 'POST' else None
     })
 
 @app.route('/getToken', methods=['GET'])
